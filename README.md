@@ -1,2 +1,2 @@
 # Algorithms
-implementation of algorithms for the purpose of testing
+implementation of basic algorithms and data structures
