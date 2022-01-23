@@ -4,9 +4,10 @@
 #include<algorithm>
 #include<vector>
 
-
 namespace algorithm {
     namespace dynamic_programming {
+        // template T is either int or double
+        // template U is either std::vector or std::array
 
         // recursive solution
         // inefficient way to deal with optimal substructure and overlapping subproblems
