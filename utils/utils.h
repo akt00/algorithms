@@ -4,8 +4,8 @@
 #include<unordered_map>
 
 
-namespace algorithm {
-    namespace util {
+namespace algorithm::util {
+    
         // arr should be either std::array or std::vector
         template<typename T>
         bool validate_sorted_array(T arr);
