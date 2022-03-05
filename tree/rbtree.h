@@ -3,6 +3,7 @@
 #include<algorithm>
 
 
+
 // 1. root is black
 // 2. nil is black
 // 3. child nodes of red are black
