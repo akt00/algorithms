@@ -1,7 +1,7 @@
 #ifndef ALGORITHM_RED_BLACK_TREE
 #define ALGORITHM_RED_BLACK_TREE
 #include<algorithm>
-
+#include<iostream>
 
 
 // 1. root is black
