@@ -3,8 +3,5 @@
 
 #include"sort/sort.h"
 
-namespace algorithm {
-
-}
 
 #endif
