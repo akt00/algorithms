@@ -18,6 +18,7 @@ namespace algorithm::utils {
     // load iris dataset 
     namespace iris {
         using data = std::pair<std::vector<std::vector<float>>, std::vector<int>>;
+    }
 }
 
 #endif
