@@ -4,8 +4,7 @@
 #include<algorithm>
 #include<vector>
 
-namespace algorithm {
-    namespace dynamic_programming {
+namespace algorithm::dp {
         // template T is either int or double
         // template U is either std::vector or std::array
 
