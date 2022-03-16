@@ -1,5 +1,5 @@
-#ifndef ALGORITHM_CONTAINER_QUEUE
-#define ALGORITHM_CONTAINER_QUEUE
+#ifndef ALGORITHM_CONTAINER_LIST
+#define ALGORITHM_CONTAINER_LIST
 // implementation of doubly linked list
 #include<iterator>
 
@@ -166,4 +166,4 @@ namespace algorithm::container {
 	void list<V>::merge(const list<V>& arg, bool sorted);
 }
 
-#endif // !ALGORITHM_CONTAINER_QUEUE
+#endif // !ALGORITHM_CONTAINER_LIST
