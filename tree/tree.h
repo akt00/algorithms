@@ -4,7 +4,10 @@
 
 
 #include"bstree.h" // binary search tree
-#include"dtree.h" // decision tree
+
 #include"rbtree.h" // red black tree
+
+#include"dtree.h" // decision tree
+
 
 #endif // ALGORITHM_TREE
