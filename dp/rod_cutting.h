@@ -1,5 +1,5 @@
-#ifndef ALGORITHM_DP_ROD_CUTTING
-#define ALGORITHM_DP_ROD_CUTTING
+#ifndef ALGORITHM_DP_RODCUTTING
+#define ALGORITHM_DP_RODCUTTING
 
 #include<algorithm>
 #include<vector>
@@ -64,4 +64,4 @@ namespace algorithm::dp {
     }
 }
 
-#endif // !ALGORITHM_DP_ROD_CUTTING
+#endif // !ALGORITHM_DP_RODCUTTING
