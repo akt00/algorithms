@@ -64,8 +64,8 @@ namespace algorithm::container {
 		void pop_front();
 		void pop_back();
 		void clear();
-		void merge(const list<V>&, bool); // not implemented
-		void sort(); // not implemented
+		void merge(const list<V>&, bool) = delete; // not implemented
+		void sort() = delete; // not implemented
 	};
 
 
@@ -160,10 +160,6 @@ namespace algorithm::container {
 			pop_back();
 		}
 	}
-
-	// if sorted is false, sort both arg and this.list
-	template<typename V>
-	void list<V>::merge(const list<V>& arg, bool sorted);
 }
 
 #endif // !ALGORITHM_CONTAINER_LIST
