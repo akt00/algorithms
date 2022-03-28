@@ -1,13 +1,15 @@
-// top header for trees
 #ifndef ALGORITHM_TREE
 #define ALGORITHM_TREE
 
 
-#include"bstree.h" // binary search tree
+#include"bstree.h"
 
-#include"rbtree.h" // red black tree
+#include"rbtree.h"
 
-#include"dtree.h" // decision tree
+// #include"dtree.h"
 
+#if _DEBUG
+#include"tree_test.h"
+#endif // _DEBUG
 
-#endif // ALGORITHM_TREE
+#endif // ALGORTIHM_TREE
