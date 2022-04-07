@@ -2,10 +2,12 @@
 #define ALGORITHM_CONTAINER_LIST
 // implementation of doubly linked list
 #include<iterator>
-
+#include<functional>
+#include<iostream>
 
 namespace algorithm::container {
 
+	// node for linked list
 	template<typename VALUE>
 	struct list_node {
 		VALUE value;
@@ -13,6 +15,8 @@ namespace algorithm::container {
 		list_node<VALUE>* prev;
 	};
 
+	// doubly linked list class
+	// either operator< must be implemented for custom objects or custom comparator must be provided if merge or sort operation are used
 	template<typename V>
 	class list {
 	public:
@@ -49,7 +53,7 @@ namespace algorithm::container {
 		list_node<V>* tail; // pointer to the tail node
 
 	public:
-		explicit list() { list_size = 0, head = nullptr, tail = nullptr; }
+		list() { list_size = 0, head = nullptr, tail = nullptr; }
 		list(const list<V>&);
 		list& operator=(const list<V>&);
 		~list() { clear(); }
@@ -64,12 +68,21 @@ namespace algorithm::container {
 		void pop_front();
 		void pop_back();
 		void clear();
-		void merge(const list<V>&, bool) = delete; // not implemented
-		void sort() = delete; // not implemented
+		template<typename Comparator = std::less<>>
+		void merge(list<V>&, Comparator comp = {}); // merge another list. the input list will be destroyed upon completion of merging.
+		template<typename Comparator = std::less<>>
+		void sort(Comparator comp = {});// performs merge sort
+		// merge implementation is based on https://www.geeksforgeeks.org/merge-sort-for-doubly-linked-list/
+	private: // helper functions
+		template<typename Comparator = std::less<>>
+		auto merge_sort(list_node<V>* head, Comparator comp = {}) -> decltype(head);
+		auto split(list_node<V>* head) -> decltype(head);
+		template<typename Comparator = std::less<>>
+		auto merge_nodes(list_node<V>* left, list_node<V>* right, Comparator comp = {}) -> decltype(head);
 	};
 
 
-	// list member implementatoins
+	// list method implementatoins
 	template<typename V>
 	list<V>::list(const list<V>& arg) {
 		list_size = 0;
@@ -160,6 +173,249 @@ namespace algorithm::container {
 			pop_back();
 		}
 	}
+
+	template<typename V>
+	template<typename Comparator>
+	void list<V>::merge(list<V>& arg,  Comparator comp) {
+
+		auto current1 = head;
+		auto current2 = arg.head;
+		decltype(head) newHead = nullptr;
+		decltype(tail) newTail = nullptr;
+		this->list_size = 0;
+
+		while (current1 != nullptr && current2 != nullptr) {
+			list_size++;
+			if (comp(current1->value, current2->value) == true) {
+				if (newHead == nullptr) {
+					newHead = current1;
+					newTail = current1;
+				}
+				else {
+					newTail->next = current1;
+					current1->prev = newTail;
+					newTail = newTail->next;
+				}
+				current1 = current1->next;
+			}
+			else {
+				if (newHead == nullptr) {
+					newHead = current2;
+					newTail = current2;
+				}
+				else {
+					newTail->next = current2;
+					current2->prev = newTail;
+					newTail = newTail->next;
+				}
+				current2 = current2->next;
+			}
+		}
+
+		while (current1 != nullptr) {
+			list_size++;
+			if (newHead == nullptr) {
+				newHead = current1;
+				newTail = current1;
+			}
+			else {
+				newTail->next = current1;
+				current1->prev = newTail;
+				newTail = newTail->next;
+			}
+			current1 = current1->next;
+		}
+
+		while (current2 != nullptr) {
+			list_size++;
+			if (newHead == nullptr) {
+				newHead = current2;
+				newTail = current2;
+			}
+			else {
+				newTail->next = current2;
+				current2->prev = newTail;
+				newTail = newTail->next;
+			}
+			current2 = current2->next;
+		}
+
+		head = newHead;
+		tail = newTail;
+
+		arg.head = nullptr;
+		arg.tail = nullptr;
+		arg.list_size = 0;
+	}
+
+	template<typename V>
+	template<typename Comparator>
+	void list<V>::sort(Comparator comp) {
+
+		head = merge_sort(head, comp);
+		if (head == nullptr) tail = nullptr;
+		else {
+			auto current = head;
+			while (current->next != nullptr) {
+				current = current->next;
+			}
+			tail = current;
+		}
+	}
+	// break down the list nodes into a single node and merge them
+	template<typename V>
+	template<typename Comparator>
+	auto list<V>::merge_sort(list_node<V>* head, Comparator comp) -> decltype(head) {
+
+		if (head == nullptr || head->next == nullptr) return head;
+
+		auto rightHead = split(head);
+		head = merge_sort(head);
+		rightHead = merge_sort(rightHead);
+		return merge_nodes(head, rightHead, comp);
+	}
+
+	template<typename V>
+	auto list<V>::split(list_node<V>* head) -> decltype(head) {
+
+		auto fast = head;
+		auto slow = head;
+		while (fast->next != nullptr && fast->next->next != nullptr) {
+			fast = fast->next->next;
+			slow = slow->next;
+		}
+		auto temp = slow->next;
+		slow->next = nullptr;
+		return temp;
+	}
+
+	template<typename V>
+	template<typename Comparator>
+	auto list<V>::merge_nodes(list_node<V>* left, list_node<V>* right, Comparator comp) -> decltype(head) {
+
+		if (left == nullptr) return right;
+		if (right == nullptr) return left;
+		if (comp(left->value, right->value) == true) {
+			left->next = merge_nodes(left->next, right, comp);
+			left->next->prev = left;
+			left->prev = nullptr;
+			return left;
+		}
+		else {
+			right->next = merge_nodes(left, right->next, comp);
+			right->next->prev = right;
+			right->prev = nullptr;
+			return right;
+		}
+	}
+
+	/*
+	template<typename V>
+	template<typename Comparator>
+	void list<V>::merge_sort(list_node<V>* left, list_node<V>* right, Comparator comp) {
+
+		std::cout << "left value = " << left->value << " right value = " << right->value << std::endl;
+		if (left != right) {
+			auto midNode = bidrectional_mid_finder(left, right);
+			auto rightHead = midNode->next;
+			std::cout << "mid node = " << midNode->value << std::endl;
+			merge_sort(left, midNode, comp);
+			merge_sort(midNode->next, right, comp);
+			std::cout << "left = " << left->value << " right = " << right->value << std::endl;
+			std::cout << "merge called...\n";
+			merge_nodes(left, rightHead, right->next, comp);
+		}
+	}
+
+	// test passed
+	template<typename V>
+	auto list<V>::bidrectional_mid_finder(list_node<V>* left, list_node<V>* right) -> decltype(head) const {
+
+		while (left != right && left->next != right) {
+			left = left->next;
+			right = right->prev;
+		}
+		return left;
+	}
+	
+	// might contain bugs
+	// leftHead cannot be nullptr
+	template<typename V>
+	template<typename Comparator>
+	void list<V>::merge_nodes(list_node<V>* leftHead, list_node<V>* rightHead, list_node<V>* rightEnd, Comparator comp) {
+
+		std::cout << "leftHead = " << leftHead->value << " rightHead = " << rightHead->value << std::endl;
+		if(rightEnd != nullptr) std::cout << " rightEnd = " << rightEnd->value << std::endl;
+		
+		auto currentLeft = leftHead;
+		auto currentRight = rightHead;
+		auto newHeadPrev = leftHead->prev;
+		list_node<V>* newHead = nullptr;
+		list_node<V>* newTail = newHead;
+		rightHead->prev->next = nullptr; // set the end of left list to nullptr
+		if (rightEnd != nullptr) rightEnd->prev->next = nullptr; // set the end of right list to nullptr
+
+		while (currentLeft != nullptr && currentRight != nullptr) {
+			if (comp(currentLeft->value, currentRight->value) == true) {
+				if (newHead == nullptr) {
+					newHead = currentLeft;
+					newTail = currentLeft;
+				}
+				else {
+					newTail->next = currentLeft;
+					currentLeft->prev = newTail;
+					newTail = newTail->next;
+				}
+				currentLeft = currentLeft->next;
+			}
+			else {
+				if (newHead == nullptr) {
+					newHead = currentRight;
+					newTail = currentRight;
+				}
+				else {
+					newTail->next = currentRight;
+					currentRight->prev = newTail;
+					newTail = newTail->next;
+				}
+				currentRight = currentRight->next;
+			}
+		}
+		
+		while (currentLeft != nullptr) {
+			if (newHead == nullptr) {
+				newHead = currentLeft;
+				newTail = currentLeft;
+			}
+			else {
+				newTail->next = currentLeft;
+				currentLeft->prev = newTail;
+				newTail = newTail->next;
+			}
+			currentLeft = currentLeft->next;
+		}
+
+		while (currentRight != nullptr) {
+			if (newHead == nullptr) {
+				newHead = currentRight;
+				newTail = currentRight;
+			}
+			else {
+				newTail->next = currentRight;
+				currentRight->prev = newTail;
+				newTail = newTail->next;
+			}
+			currentRight = currentRight->next;
+		}
+
+		newHead->prev = newHeadPrev;
+		if (newHeadPrev != nullptr) newHeadPrev->next = newHead;
+		newTail->next = rightEnd;
+		if (rightEnd != nullptr) rightEnd->prev = newTail;
+
+		std::cout << newHead->prev << " " << newHead->value << " " << newTail->value << " " << newTail->next->value << " exited...\n";
+	}
+	*/
 }
 
 #endif // !ALGORITHM_CONTAINER_LIST
