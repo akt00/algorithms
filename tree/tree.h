@@ -2,9 +2,9 @@
 #define ALGORITHM_TREE
 
 
-#include"bstree.h"
+#include"binary_search_tree.h"
 
-#include"rbtree.h"
+#include"red_black_tree.h"
 
 // #include"dtree.h"
 
