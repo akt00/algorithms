@@ -4,4 +4,9 @@
 
 #include"list.h"
 
+#include"queue.h"
+
+#include"stack.h"
+
+
 #endif
