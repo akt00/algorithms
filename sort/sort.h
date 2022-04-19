@@ -2,23 +2,23 @@
 #define ALGORITHM_SORT
 
 
-#include"bucketSort.h"
+#include"bucket_sort.h"
 
-#include"countingSort.h"
+#include"counting_sort.h"
 
-#include"insertionSort.h"
+#include"insertion_sort.h"
 
-#include"introSort.h"  // c++ stl sorting algorithm
+#include"intro_sort.h"  // c++ stl sorting algorithm
 
-#include"heapSort.h"
+#include"heap_sort.h"
 
-#include"mergeSort.h"
+#include"merge_sort.h"
 
-#include"quickSort.h"
+#include"quick_sort.h"
 
-#include"radixSort.h"
+#include"radix_sort.h"
 
-#include"timSort.h" // python stl sorting algorithm
+#include"tim_sort.h" // python stl sorting algorithm
 
 
 #endif // ALGORITHM_SORT
