@@ -3,16 +3,16 @@
 // implementation of doubly linked list
 #include<iterator>
 #include<functional>
-#include<iostream>
+
 
 namespace algorithm::container {
 
 	// node for linked list
-	template<typename VALUE>
-	struct list_node {
-		VALUE value;
-		list_node<VALUE>* next;
-		list_node<VALUE>* prev;
+	template<typename V>
+	struct ListNode {
+		V value;
+		ListNode<V>* next;
+		ListNode<V>* prev;
 	};
 
 	// doubly linked list class
@@ -21,91 +21,98 @@ namespace algorithm::container {
 	class list {
 	public:
 		// forward iterator
-		class list_iterator {
+		class ListIterator {
 		public:
 			using iterator_category = std::forward_iterator_tag;
 			using value_type = V;
 			using pointer = V*;
 			using reference = V&;
 
-			explicit list_iterator(list_node<V>* arg) : current_ptr(arg) {}
-			list_iterator& operator=(const list_iterator& arg) { current_ptr = arg.current_ptr; return *this; }
-			list_iterator& operator++() { if (current_ptr != nullptr) current_ptr = current_ptr->next; return *this; } // prefix ++
-			list_iterator operator++(int) { list_iterator ret = *this; ++(*this); return ret; } // postfix ++
+			ListIterator(ListNode<V>* other) : current_ptr(other) {}
+			ListIterator(const ListIterator& other) : current_ptr(other.current_ptr) {}
+			ListIterator& operator=(const ListIterator& other) { current_ptr = other.current_ptr; return *this; }
+			ListIterator& operator++() { if (current_ptr != nullptr) current_ptr = current_ptr->next; return *this; } // prefix ++
+			ListIterator operator++(int) { ListIterator ret = *this; ++(*this); return ret; } // postfix ++
 			reference operator*() { return current_ptr->value; }
 			pointer operator->() { return &current_ptr->value; }
-			friend bool operator==(const list_iterator& l, const list_iterator& r) {
+			friend bool operator==(const ListIterator& l, const ListIterator& r) {
 				if (l.current_ptr == r.current_ptr) return true;
 				return false;
 			}
-			friend bool operator!=(const list_iterator& l, const list_iterator& r) {
+			friend bool operator!=(const ListIterator& l, const ListIterator& r) {
 				if (l.current_ptr != r.current_ptr) return true;
 				return false;
 			}
 
 		private:
-			list_node<V>* current_ptr;
+			ListNode<V>* current_ptr;
 		};
 
-	private:
-		unsigned list_size; // number of nodes in list
-		list_node<V>* head; // pointer to the head node
-		list_node<V>* tail; // pointer to the tail node
-
-	public:
 		list() { list_size = 0, head = nullptr, tail = nullptr; }
-		list(const list<V>&);
-		list& operator=(const list<V>&);
+		list(const list<V>& other);
+		list& operator=(const list<V>& other);
 		~list() { clear(); }
-		list_node<V>* front() const { return head; }
-		list_node<V>* back() const { return tail; }
-		list_iterator begin() const { return list_iterator(head); } // return iterator
-		list_iterator end() const { return list_iterator(nullptr); } // return end of iterator
-		bool empty() const { return (list_size == 0) ? true:false; }
+		const V& front() const { return head->value; } // must call empty() in advance
+		const V& back() const { return tail->value; } // must call empty() in advance
+		ListIterator begin() const { return ListIterator(head); } // return an iterator
+		ListIterator end() const { return ListIterator(nullptr); } // return the end of the iterator
+		bool empty() const { return (list_size == 0) ? true : false; }
 		unsigned size() const { return list_size; }
-		void push_front(V);
-		void push_back(V);
+		ListIterator find(V key) const { for (auto iter = begin(); iter != end(); iter++) if(*iter == key) return iter; return end(); }
+		// following push implementations call copy consturctor twice on user objects
+		void push_front(V data);
+		void push_back(V data);
 		void pop_front();
 		void pop_back();
 		void clear();
-		template<typename Comparator = std::less<>>
-		void merge(list<V>&, Comparator comp = {}); // merge another list. the input list will be destroyed upon completion of merging.
+		template<typename Comparator = std::less<V>>
+		void merge(list<V>& other, Comparator comp = {}); // merge another list. the input list will be destroyed upon completion of merging.
 		template<typename Comparator = std::less<>>
 		void sort(Comparator comp = {});// performs merge sort
+
 		// merge implementation is based on https://www.geeksforgeeks.org/merge-sort-for-doubly-linked-list/
-	private: // helper functions
+	private:
+		unsigned list_size; // number of nodes in list
+		ListNode<V>* head; // pointer to the head node
+		ListNode<V>* tail; // pointer to the tail node
+
+		// helper functions below
 		template<typename Comparator = std::less<>>
-		auto merge_sort(list_node<V>* head, Comparator comp = {}) -> decltype(head);
-		auto split(list_node<V>* head) -> decltype(head);
+		auto merge_sort(ListNode<V>* head, Comparator comp = {}) -> decltype(head);
+		auto split(ListNode<V>* head) -> decltype(head);
 		template<typename Comparator = std::less<>>
-		auto merge_nodes(list_node<V>* left, list_node<V>* right, Comparator comp = {}) -> decltype(head);
+		auto merge_nodes(ListNode<V>* left, ListNode<V>* right, Comparator comp = {}) -> decltype(head);
 	};
 
 
-	// list method implementatoins
+	// list method implementatoins below
+
 	template<typename V>
-	list<V>::list(const list<V>& arg) {
+	list<V>::list(const list<V>& other) {
+
 		list_size = 0;
 		head = nullptr;
 		tail = nullptr;
-		for (auto i = arg.begin(); i != arg.end(); i++) {
+		for (auto i = other.begin(); i != other.end(); i++) {
 			this->push_back(*i);
 		}
 	}
 
 	template<typename V>
-	list<V>& list<V>::operator=(const list<V>& arg) {
-		if (arg != this) {
+	list<V>& list<V>::operator=(const list<V>& other) {
+
+		if (&other != this) {
 			this->clear();
-			for (auto i = arg.begin(); i != arg.end(); i++) {
+			for (auto i = other.begin(); i != other.end(); i++) {
 				this->push_back(*i);
 			}
 		}
+		return *this;
 	}
 
 	template<typename V>
-	void list<V>::push_front(V value) {
-		list_node<V>* new_node = new list_node<V>{ value, nullptr, nullptr };
+	inline void list<V>::push_front(V value) {
+		ListNode<V>* new_node = new ListNode<V>{ value, nullptr, nullptr };
 		if (head == nullptr) {
 			head = new_node;
 			tail = new_node;
@@ -119,8 +126,8 @@ namespace algorithm::container {
 	}
 
 	template<typename V>
-	void list<V>::push_back(V value) {
-		list_node<V>* new_node = new list_node<V>{ value, nullptr, nullptr };
+	inline void list<V>::push_back(V value) {
+		ListNode<V>* new_node = new ListNode<V>{ value, nullptr, nullptr };
 		if (tail == nullptr) {
 			head = new_node;
 			tail = new_node;
@@ -134,7 +141,7 @@ namespace algorithm::container {
 	}
 
 	template<typename V>
-	void list<V>::pop_front() {
+	inline void list<V>::pop_front() {
 		if (head != nullptr) {
 			auto temp = head;
 			if (head->next == nullptr) {
@@ -151,7 +158,7 @@ namespace algorithm::container {
 	}
 
 	template<typename V>
-	void list<V>::pop_back() {
+	inline void list<V>::pop_back() {
 		if (tail != nullptr) {
 			auto temp = tail;
 			if (tail->prev == nullptr) {
@@ -168,18 +175,14 @@ namespace algorithm::container {
 	}
 
 	template<typename V>
-	void list<V>::clear() {
-		while (!this->empty()) {
-			pop_back();
-		}
-	}
+	inline void list<V>::clear() { while (!empty()) pop_back(); }
 
 	template<typename V>
 	template<typename Comparator>
-	void list<V>::merge(list<V>& arg,  Comparator comp) {
+	inline void list<V>::merge(list<V>& other,  Comparator comp) {
 
 		auto current1 = head;
-		auto current2 = arg.head;
+		auto current2 = other.head;
 		decltype(head) newHead = nullptr;
 		decltype(tail) newTail = nullptr;
 		this->list_size = 0;
@@ -243,14 +246,14 @@ namespace algorithm::container {
 		head = newHead;
 		tail = newTail;
 
-		arg.head = nullptr;
-		arg.tail = nullptr;
-		arg.list_size = 0;
+		other.head = nullptr;
+		other.tail = nullptr;
+		other.list_size = 0;
 	}
 
 	template<typename V>
 	template<typename Comparator>
-	void list<V>::sort(Comparator comp) {
+	inline void list<V>::sort(Comparator comp) {
 
 		head = merge_sort(head, comp);
 		if (head == nullptr) tail = nullptr;
@@ -262,10 +265,11 @@ namespace algorithm::container {
 			tail = current;
 		}
 	}
+
 	// break down the list nodes into a single node and merge them
 	template<typename V>
 	template<typename Comparator>
-	auto list<V>::merge_sort(list_node<V>* head, Comparator comp) -> decltype(head) {
+	inline auto list<V>::merge_sort(ListNode<V>* head, Comparator comp) -> decltype(head) {
 
 		if (head == nullptr || head->next == nullptr) return head;
 
@@ -276,7 +280,7 @@ namespace algorithm::container {
 	}
 
 	template<typename V>
-	auto list<V>::split(list_node<V>* head) -> decltype(head) {
+	inline auto list<V>::split(ListNode<V>* head) -> decltype(head) {
 
 		auto fast = head;
 		auto slow = head;
@@ -291,7 +295,7 @@ namespace algorithm::container {
 
 	template<typename V>
 	template<typename Comparator>
-	auto list<V>::merge_nodes(list_node<V>* left, list_node<V>* right, Comparator comp) -> decltype(head) {
+	inline auto list<V>::merge_nodes(ListNode<V>* left, ListNode<V>* right, Comparator comp) -> decltype(head) {
 
 		if (left == nullptr) return right;
 		if (right == nullptr) return left;
@@ -308,114 +312,6 @@ namespace algorithm::container {
 			return right;
 		}
 	}
-
-	/*
-	template<typename V>
-	template<typename Comparator>
-	void list<V>::merge_sort(list_node<V>* left, list_node<V>* right, Comparator comp) {
-
-		std::cout << "left value = " << left->value << " right value = " << right->value << std::endl;
-		if (left != right) {
-			auto midNode = bidrectional_mid_finder(left, right);
-			auto rightHead = midNode->next;
-			std::cout << "mid node = " << midNode->value << std::endl;
-			merge_sort(left, midNode, comp);
-			merge_sort(midNode->next, right, comp);
-			std::cout << "left = " << left->value << " right = " << right->value << std::endl;
-			std::cout << "merge called...\n";
-			merge_nodes(left, rightHead, right->next, comp);
-		}
-	}
-
-	// test passed
-	template<typename V>
-	auto list<V>::bidrectional_mid_finder(list_node<V>* left, list_node<V>* right) -> decltype(head) const {
-
-		while (left != right && left->next != right) {
-			left = left->next;
-			right = right->prev;
-		}
-		return left;
-	}
-	
-	// might contain bugs
-	// leftHead cannot be nullptr
-	template<typename V>
-	template<typename Comparator>
-	void list<V>::merge_nodes(list_node<V>* leftHead, list_node<V>* rightHead, list_node<V>* rightEnd, Comparator comp) {
-
-		std::cout << "leftHead = " << leftHead->value << " rightHead = " << rightHead->value << std::endl;
-		if(rightEnd != nullptr) std::cout << " rightEnd = " << rightEnd->value << std::endl;
-		
-		auto currentLeft = leftHead;
-		auto currentRight = rightHead;
-		auto newHeadPrev = leftHead->prev;
-		list_node<V>* newHead = nullptr;
-		list_node<V>* newTail = newHead;
-		rightHead->prev->next = nullptr; // set the end of left list to nullptr
-		if (rightEnd != nullptr) rightEnd->prev->next = nullptr; // set the end of right list to nullptr
-
-		while (currentLeft != nullptr && currentRight != nullptr) {
-			if (comp(currentLeft->value, currentRight->value) == true) {
-				if (newHead == nullptr) {
-					newHead = currentLeft;
-					newTail = currentLeft;
-				}
-				else {
-					newTail->next = currentLeft;
-					currentLeft->prev = newTail;
-					newTail = newTail->next;
-				}
-				currentLeft = currentLeft->next;
-			}
-			else {
-				if (newHead == nullptr) {
-					newHead = currentRight;
-					newTail = currentRight;
-				}
-				else {
-					newTail->next = currentRight;
-					currentRight->prev = newTail;
-					newTail = newTail->next;
-				}
-				currentRight = currentRight->next;
-			}
-		}
-		
-		while (currentLeft != nullptr) {
-			if (newHead == nullptr) {
-				newHead = currentLeft;
-				newTail = currentLeft;
-			}
-			else {
-				newTail->next = currentLeft;
-				currentLeft->prev = newTail;
-				newTail = newTail->next;
-			}
-			currentLeft = currentLeft->next;
-		}
-
-		while (currentRight != nullptr) {
-			if (newHead == nullptr) {
-				newHead = currentRight;
-				newTail = currentRight;
-			}
-			else {
-				newTail->next = currentRight;
-				currentRight->prev = newTail;
-				newTail = newTail->next;
-			}
-			currentRight = currentRight->next;
-		}
-
-		newHead->prev = newHeadPrev;
-		if (newHeadPrev != nullptr) newHeadPrev->next = newHead;
-		newTail->next = rightEnd;
-		if (rightEnd != nullptr) rightEnd->prev = newTail;
-
-		std::cout << newHead->prev << " " << newHead->value << " " << newTail->value << " " << newTail->next->value << " exited...\n";
-	}
-	*/
 }
 
 #endif // !ALGORITHM_CONTAINER_LIST
