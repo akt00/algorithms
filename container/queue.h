@@ -1,6 +1,6 @@
 #ifndef ALGORITHM_CONTAINER_QUEUE
 #define ALGORITHM_CONTAINER_QUEUE
-// linked list implementation of queue
+// implementation queue with linked list
 
 
 namespace algorithm::container {
@@ -12,12 +12,9 @@ namespace algorithm::container {
 		QueueStackNode<T>* next;
 	};
 
+	// queue interface
 	template<typename T>
 	class queue {
-	private:
-		QueueStackNode<T>* head; // out
-		QueueStackNode<T>* tail; // in
-		unsigned queue_size;
 	public:
 		queue();
 		queue(const queue<T>& other);
@@ -31,10 +28,15 @@ namespace algorithm::container {
 		void pop();
 		void clear();
 		void swap(queue<T>& other);
+
+	private:
+		QueueStackNode<T>* head; // out
+		QueueStackNode<T>* tail; // in
+		unsigned queue_size;
 	};
 
 
-	// implementations
+	// queue implementations
 
 	template<typename T>
 	queue<T>::queue() {
@@ -49,12 +51,12 @@ namespace algorithm::container {
 
 		head = nullptr;
 		tail = nullptr;
+		queue_size = 0;
 		auto current = other.head;
 		while (current != nullptr) {
 			push(current->data);
 			current = current->next;
 		}
-		queue_size = other.queue_size;
 	}
 
 	template<typename T>
@@ -62,34 +64,32 @@ namespace algorithm::container {
 
 		if (&other != this) {
 			clear();
-			head = nullptr;
-			tail = nullptr;
 			auto current = other.head;
 			while (current != nullptr) {
 				push(current->data);
 				current = current->next;
 			}
-			queue_size = other.queue_size;
 		}
+		return *this;
 	}
 
 	template<typename T>
 	queue<T>::~queue() { clear(); }
 
 	template<typename T>
-	const T& queue<T>::front() const { return head->data; }
+	inline const T& queue<T>::front() const { return head->data; }
 
 	template<typename T>
-	const T& queue<T>::back() const { return tail->data; }
+	inline const T& queue<T>::back() const { return tail->data; }
 
 	template<typename T>
-	bool queue<T>::empty() const { return (queue_size == 0) ? true : false; }
+	inline bool queue<T>::empty() const { return (queue_size == 0) ? true : false; }
 
 	template<typename T>
-	unsigned queue<T>::size() const { return queue_size; }
+	inline unsigned queue<T>::size() const { return queue_size; }
 
 	template<typename T>
-	void queue<T>::push(T data) {
+	inline void queue<T>::push(T data) {
 
 		auto temp = new QueueStackNode<T>{ data, nullptr };
 		if (tail == nullptr) {
@@ -104,7 +104,7 @@ namespace algorithm::container {
 	}
 
 	template<typename T>
-	void queue<T>::pop() {
+	inline void queue<T>::pop() {
 
 		if (!empty()) {
 			auto temp = head;
@@ -121,10 +121,10 @@ namespace algorithm::container {
 	}
 
 	template<typename T>
-	void queue<T>::clear() { while (!empty()) pop(); }
+	inline void queue<T>::clear() { while (!empty()) pop(); }
 
 	template<typename T>
-	void queue<T>::swap(queue<T>& other) {
+	inline void queue<T>::swap(queue<T>& other) {
 
 		if (&other != this) {
 			auto tmp_head = other.head;
