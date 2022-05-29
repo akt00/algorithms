@@ -1,30 +1,34 @@
 #ifndef ALGORITHM_CONTAINER_STACK
 #define ALGORITHM_CONTAINER_STACK
+// implementation of stack with linked list
+
 #ifndef ALGORITHM_CONTAINER_QUEUE
 #include"queue.h"
 #endif
-// linked list implementation of stack
 
 
 namespace algorithm::container {
 
 	template<typename T>
 	class stack {
-	private:
-		QueueStackNode<T>* head;
-		unsigned stack_size;
 	public:
 		stack();
 		stack(const stack<T>& other);
 		stack<T>& operator=(const stack<T>& other);
 		~stack();
-		T& top() const; // calling top() while empty() causes an error
+		const T& top() const; // calling top() while empty() causes an error
 		bool empty() const;
 		unsigned size() const;
 		void push(T data); // this implementation call copy consturctor twice on user objects
 		void pop();
-		void clear();
+		void clear(); // erase all elements
 		void swap(stack<T>& other);
+
+	private:
+		QueueStackNode<T>* head;
+		unsigned stack_size;
+		// helper function for copy constuctor/insertion
+		void RecursivePush(QueueStackNode<T>* current);
 	};
 
 
@@ -40,13 +44,9 @@ namespace algorithm::container {
 	template<typename T>
 	stack<T>::stack(const stack<T>& other) {
 
-		auto current = other.head;
-		if (current == nullptr) head = nullptr;
-		while (current != nullptr) {
-			push(current->data);
-			current = current->next;
-		}
-		stack_size = other.stack_size;
+		head = nullptr;
+		stack_size = 0;
+		RecursivePush(other.head);
 	}
 
 	template<typename T>
@@ -54,31 +54,26 @@ namespace algorithm::container {
 
 		if (&other != this) {
 			clear();
-			auto current = other.head;
-			if (current != nullptr) head = nullptr;
-			while (current != nullptr) {
-				push(current->data);
-				current = current->next;
-			}
-			stack_size = other.stack_size;
+			RecursivePush(other.head);
 		}
+		return *this;
 	}
 
 	template<typename T>
 	stack<T>::~stack() { clear(); }
 
 	template<typename T>
-	T& stack<T>::top() const { return head->data; }
+	inline const T& stack<T>::top() const { return head->data; }
 
 	template<typename T>
-	bool stack<T>::empty() const { return (stack_size == 0) ? true : false; }
+	inline bool stack<T>::empty() const { return (stack_size == 0) ? true : false; }
 
 	template<typename T>
-	unsigned stack<T>::size() const { return stack_size; }
+	inline unsigned stack<T>::size() const { return stack_size; }
 	
 	// this implementation calls copy constructor twice
 	template<typename T>
-	void stack<T>::push(T data) {
+	inline void stack<T>::push(T data) {
 
 		auto new_node = new QueueStackNode<T>{ data, head };
 		head = new_node;
@@ -86,7 +81,7 @@ namespace algorithm::container {
 	}
 
 	template<typename T>
-	void stack<T>::pop() {
+	inline void stack<T>::pop() {
 
 		if (!empty()) {
 			auto temp = head;
@@ -97,10 +92,10 @@ namespace algorithm::container {
 	}
 
 	template<typename T>
-	void stack<T>::clear() { while (!empty()) pop(); }
+	inline void stack<T>::clear() { while (!empty()) pop(); }
 
 	template<typename T>
-	void stack<T>::swap(stack<T>& other) {
+	inline void stack<T>::swap(stack<T>& other) {
 
 		if (&other != this) {
 			auto temp = head;
@@ -110,6 +105,15 @@ namespace algorithm::container {
 			auto tmp = other.stack_size;
 			other.stack_size = stack_size;
 			stack_size = tmp;
+		}
+	}
+
+	template<typename T>
+	inline void stack<T>::RecursivePush(QueueStackNode<T>* current) {
+
+		if (current != nullptr) {
+			RecursivePush(current->next);
+			push(current->data);
 		}
 	}
 }
