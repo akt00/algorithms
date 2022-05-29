@@ -2,6 +2,8 @@
 #define ALGORITHM_CONTAINER
 
 
+#include"disjoint_set.h"
+
 #include"list.h"
 
 #include"queue.h"
