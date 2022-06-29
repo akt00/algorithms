@@ -7,7 +7,7 @@
   Requires C++17 or later. This library is written with C++ standard libraries with no external dependencies.
  
 # Implemeted algorithms
-## Introduction to Algorithms 3rd edition
+### Introduction to Algorithms 3rd edition
  Chapter 2
   - heapsort
   - quicksort
