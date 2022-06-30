@@ -15,8 +15,8 @@
   - sort
   - tree
   - utilility
-  - seaquential search
-  - binary search
+    - seaquential search
+    - binary search
 
 # Introduction to Algorithms 3rd edition
  Chapter 2
