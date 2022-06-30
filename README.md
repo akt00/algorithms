@@ -6,7 +6,9 @@
 # Requirements
   Requires C++17 or later. This library is written with C++ standard libraries with no external dependencies.
  
-# Implemeted algorithms
+# Implemeted algorithms (planned)
+  - container
+  - 
 
 # Introduction to Algorithms 3rd edition
  Chapter 2
