@@ -42,9 +42,9 @@ Chapter 4
     - longest common subsequence
     - optimal binary search tree
   - greedy algorithm
-  - activity selection
-  - huffman codes
-  - matroids
+    - activity selection
+    - huffman codes
+    - matroids
 
 Chapter 5
   - b-tree
