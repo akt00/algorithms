@@ -8,7 +8,15 @@
  
 # Implemeted algorithms (planned)
   - container
-  - 
+  - dynamic programming
+  - graph
+  - greedy algortihm
+  - hash table
+  - sort
+  - tree
+  - utilility
+  - seaquential search
+  - binary search
 
 # Introduction to Algorithms 3rd edition
  Chapter 2
